@@ -39,7 +39,7 @@ EPOCHS = 20
 BS = 32
 
 DIRECTORY = "dataset"
-DIRECTORY = "mini_dataset"
+# DIRECTORY = "mini_dataset"
 CATEGORIES = ["with_mask", "without_mask"]
 
 # grab the list of images in our dataset directory, then initialize
@@ -90,56 +90,45 @@ from tensorflow.keras import layers, regularizers
 num_classes = 2
 input_shape = (224, 224, 3)
 
-
+print("orig x_train shape:", trainX.shape)
+print("orig y_train shape:", trainY.shape)
 #------------------------------------------------------------------------
-#ver1
+
+
+#CNN
 model = keras.Sequential()
 model.add(Conv2D(16, (3,3), padding='same', input_shape=trainX.shape[1:],activation='relu'))
+model.add(Conv2D(16, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(16, (3,3), padding='same', activation='relu'))
 model.add(Conv2D(16, (3,3), strides=(2,2), padding='same', activation='relu'))
 model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
 model.add(Conv2D(32, (3,3), strides=(2,2), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), strides=(2,2), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), strides=(2,2), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), strides=(2,2), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+
 model.add(Dropout(0.5))
 model.add(Flatten())
-model.add(Dense(num_classes, activation='softmax',kernel_regularizer=regularizers.l1(0.0001))) #change the weight parameter of L1(bigger and smaller including 0)
+model.add(Dense(num_classes, activation='softmax',kernel_regularizer=regularizers.l1(0.00001))) #change the weight parameter of L1(bigger and smaller including 0)
 model.compile(loss="categorical_crossentropy", optimizer='adam', metrics=["accuracy"])
 model.summary()
 
-# #ver2
-# model = keras.Sequential()
-# model.add(Conv2D(16, (3,3), padding='same', input_shape=trainX.shape[1:],activation='relu'))
-# model.add(MaxPooling2D(pool_size=(2,2)))
-# model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
-# model.add(MaxPooling2D(pool_size=(2,2)))
-# model.add(Dropout(0.5))
-# model.add(Flatten())
-# model.add(Dense(num_classes, activation='softmax',kernel_regularizer=regularizers.l1(0.0001))) #change the weight parameter of L1(bigger and smaller including 0)
-# model.compile(loss="categorical_crossentropy", optimizer='adam', metrics=["accuracy"])
-# model.summary()
 
-#ver3
-# model = keras.Sequential()
-# model.add(Conv2D(16, (3,3), padding='same', input_shape=trainX.shape[1:],activation='relu'))
-# model.add(Conv2D(16, (3,3), strides=(2,2), padding='same', activation='relu'))
-# model.add(Conv2D(16, (3,3), strides=(2,2), padding='same', activation='relu'))
-# model.add(Conv2D(16, (3,3), strides=(2,2), padding='same', activation='relu'))
-# model.add(Conv2D(16, (3,3), strides=(2,2), padding='same', activation='relu'))
-# #model.add(MaxPooling2D(pool_size=(2,2)))
-# model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
-# model.add(Conv2D(32, (3,3), strides=(2,2), padding='same', activation='relu'))
-# model.add(Conv2D(16, (3,3), strides=(2,2), padding='same', activation='relu'))
-# #model.add(MaxPooling2D(pool_size=(2,2)))
-# model.add(Dropout(0.5))
-# model.add(Flatten())
-# model.add(Dense(num_classes, activation='softmax',kernel_regularizer=regularizers.l1(0.0001))) #change the weight parameter of L1(bigger and smaller including 0)
-# model.compile(loss="categorical_crossentropy", optimizer='adam', metrics=["accuracy"])
-# model.summary()
 #------------------------------------------------------------------------
 
 batch_size = 128
 epochs = 20
 
-print("orig x_train shape:", trainX.shape)
-print("orig y_train shape:", trainY.shape)
+
 H = model.fit(trainX, trainY, batch_size=batch_size, epochs=epochs, validation_split=0.1)
 
 
