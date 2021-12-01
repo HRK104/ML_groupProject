@@ -38,7 +38,7 @@ INIT_LR = 1e-4
 EPOCHS = 20
 BS = 32
 
-DIRECTORY = "dataset"
+DIRECTORY = "Processed_Images"
 # DIRECTORY = "mini_dataset"
 CATEGORIES = ["with_mask", "without_mask"]
 
@@ -98,23 +98,15 @@ print("orig y_train shape:", trainY.shape)
 #CNN
 model = keras.Sequential()
 model.add(Conv2D(16, (3,3), padding='same', input_shape=trainX.shape[1:],activation='relu'))
-model.add(Conv2D(16, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(16, (3,3), padding='same', activation='relu'))
 model.add(Conv2D(16, (3,3), strides=(2,2), padding='same', activation='relu'))
-model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
 model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
 model.add(Conv2D(32, (3,3), strides=(2,2), padding='same', activation='relu'))
 model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
 model.add(Conv2D(64, (3,3), strides=(2,2), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), strides=(2,2), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), strides=(2,2), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(128, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(128, (3,3), strides=(2,2), padding='same', activation='relu'))
+model.add(Conv2D(256, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(256, (3,3), strides=(2,2), padding='same', activation='relu'))
 
 model.add(Dropout(0.5))
 model.add(Flatten())
