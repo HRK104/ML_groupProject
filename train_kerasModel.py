@@ -1,4 +1,7 @@
 # import the necessary packages
+from tensorflow.keras import layers, regularizers
+from keras.layers import Conv2D, MaxPooling2D, LeakyReLU
+from tensorflow import keras
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import MobileNetV2
 from tensorflow.keras.layers import AveragePooling2D
@@ -20,7 +23,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-#for detector
+# for detector
 import cv2
 import imutils
 import time
@@ -30,16 +33,13 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 
-
-
 # initialize the initial learning rate, number of epochs to train for,
 # and batch size
 INIT_LR = 1e-4
-EPOCHS = 20
+EPOCHS = 50
 BS = 32
 
-DIRECTORY = "Processed_Images"
-# DIRECTORY = "mini_dataset"
+DIRECTORY = "dataset"
 CATEGORIES = ["with_mask", "without_mask"]
 
 # grab the list of images in our dataset directory, then initialize
@@ -52,13 +52,13 @@ labels = []
 for category in CATEGORIES:
     path = os.path.join(DIRECTORY, category)
     for img in os.listdir(path):
-    	img_path = os.path.join(path, img)
-    	image = load_img(img_path, target_size=(224, 224))
-    	image = img_to_array(image)
-    	image = preprocess_input(image)
+        img_path = os.path.join(path, img)
+        image = load_img(img_path, target_size=(224, 224))
+        image = img_to_array(image)
+        image = preprocess_input(image)
 
-    	data.append(image)
-    	labels.append(category)
+        data.append(image)
+        labels.append(category)
 
 # perform one-hot encoding on the labels
 lb = LabelBinarizer()
@@ -69,60 +69,61 @@ data = np.array(data, dtype="float32")
 labels = np.array(labels)
 
 (trainX, testX, trainY, testY) = train_test_split(data, labels,
-	test_size=0.20, stratify=labels, random_state=42)
+                                                  test_size=0.20, stratify=labels, random_state=42)
 
 # construct the training image generator for data augmentation
 aug = ImageDataGenerator(
-	rotation_range=20,
-	zoom_range=0.15,
-	width_shift_range=0.2,
-	height_shift_range=0.2,
-	shear_range=0.15,
-	horizontal_flip=True,
-	fill_mode="nearest")
+    rotation_range=20,
+    zoom_range=0.15,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    shear_range=0.15,
+    horizontal_flip=True,
+    fill_mode="nearest")
 
-
-
-from tensorflow import keras
-from keras.layers import Conv2D, MaxPooling2D, LeakyReLU
-from tensorflow.keras import layers, regularizers
 # Model / data parameters
 num_classes = 2
 input_shape = (224, 224, 3)
 
 print("orig x_train shape:", trainX.shape)
 print("orig y_train shape:", trainY.shape)
-#------------------------------------------------------------------------
 
-
-#CNN
 model = keras.Sequential()
-model.add(Conv2D(16, (3,3), padding='same', input_shape=trainX.shape[1:],activation='relu'))
-model.add(Conv2D(16, (3,3), strides=(2,2), padding='same', activation='relu'))
-model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(32, (3,3), strides=(2,2), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3,3), strides=(2,2), padding='same', activation='relu'))
-model.add(Conv2D(128, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(128, (3,3), strides=(2,2), padding='same', activation='relu'))
-model.add(Conv2D(256, (3,3), padding='same', activation='relu'))
-model.add(Conv2D(256, (3,3), strides=(2,2), padding='same', activation='relu'))
+model.add(Conv2D(16, (3, 3), padding='same',
+          input_shape=trainX.shape[1:], activation='relu'))
+model.add(Conv2D(16, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(16, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(16, (3, 3), strides=(2, 2),
+          padding='same', activation='relu'))
+model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(32, (3, 3), strides=(2, 2),
+          padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), strides=(2, 2),
+          padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), strides=(2, 2),
+          padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), strides=(2, 2),
+          padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
 
 model.add(Dropout(0.5))
 model.add(Flatten())
-model.add(Dense(num_classes, activation='softmax',kernel_regularizer=regularizers.l1(0.00001))) #change the weight parameter of L1(bigger and smaller including 0)
-model.compile(loss="categorical_crossentropy", optimizer='adam', metrics=["accuracy"])
+model.add(Dense(num_classes, activation='softmax', kernel_regularizer=regularizers.l1(
+    0.00001)))  # change the weight parameter of L1(bigger and smaller including 0)
+model.compile(loss="categorical_crossentropy",
+              optimizer='adam', metrics=["accuracy"])
 model.summary()
 
-
-#------------------------------------------------------------------------
-
-batch_size = 128
-epochs = 20
-
-
-H = model.fit(trainX, trainY, batch_size=batch_size, epochs=epochs, validation_split=0.1)
-
+History = model.fit(trainX, trainY, batch_size=BS, epochs=EPOCHS, steps_per_epoch=int(
+    np.ceil(trainX.shape[0]//BS)), validation_split=0.1)
 
 # make predictions on the testing set
 print("[INFO] evaluating network...")
@@ -134,7 +135,7 @@ predIdxs = np.argmax(predIdxs, axis=1)
 
 # show a nicely formatted classification report
 print(classification_report(testY.argmax(axis=1), predIdxs,
-	target_names=lb.classes_))
+                            target_names=lb.classes_))
 
 # serialize the model to disk
 print("[INFO] saving mask detector model...")
@@ -144,16 +145,13 @@ model.save("mask_detector.model", save_format="h5")
 N = EPOCHS
 plt.style.use("ggplot")
 plt.figure()
-plt.plot(np.arange(0, N), H.history["loss"], label="train_loss")
-plt.plot(np.arange(0, N), H.history["val_loss"], label="val_loss")
-plt.plot(np.arange(0, N), H.history["accuracy"], label="train_acc")
-plt.plot(np.arange(0, N), H.history["val_accuracy"], label="val_acc")
+plt.plot(np.arange(0, N), History.history["loss"], label="train_loss")
+plt.plot(np.arange(0, N), History.history["val_loss"], label="val_loss")
+plt.plot(np.arange(0, N), History.history["accuracy"], label="train_acc")
+plt.plot(np.arange(0, N), History.history["val_accuracy"], label="val_acc")
 plt.title("Training Loss and Accuracy")
 plt.xlabel("Epoch #")
 plt.ylabel("Loss/Accuracy")
 plt.legend(loc="lower left")
 plt.savefig("plot.png")
 plt.show()
-
-
-
