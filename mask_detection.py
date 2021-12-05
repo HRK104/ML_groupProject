@@ -48,7 +48,6 @@ while True:
         (startX, startY, endX, endY) = face_box
         (mask, withoutMask) = result
 
-        label = "Mask"
         if mask > withoutMask:
             label = "With Mask"
             color = (0, 255, 0)
