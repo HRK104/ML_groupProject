@@ -13,17 +13,11 @@ from tensorflow.keras.preprocessing.image import load_img
 from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import classification_report, confusion_matrix, roc_curve
+from sklearn.dummy import DummyClassifier
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
-
-# for roc and baseline
-from sklearn.metrics import roc_curve
-from sklearn.dummy import DummyClassifier
-from sklearn.metrics import confusion_matrix
-
 
 # initialize the initial learning rate, number of epochs to train for,
 # and batch size
@@ -32,28 +26,31 @@ EPOCHS = 20
 BS = 32
 
 DIRECTORY = "dataset"
+#DIRECTORY = "small_dataset"
 CATEGORIES = ["with_mask", "without_mask"]
 
 
 def plot_roc_models(Xtest, ytest, model, dummy_clf):
-	#cnn model
-	scores = model.predict(Xtest, batch_size=BS)
-	#scores = np.argmax(scores, axis=1)
-	fpr, tpr, _ =roc_curve(np.argmax(ytest, axis=1), np.argmax(scores, axis=1))
-	cnn, = plt.plot(fpr,tpr,color='red', label='cnn')
+    # cnn model
+    scores = model.predict(Xtest, batch_size=BS)
+    #scores = np.argmax(scores, axis=1)
+    fpr, tpr, _ = roc_curve(np.argmax(ytest, axis=1),
+                            np.argmax(scores, axis=1))
+    cnn, = plt.plot(fpr, tpr, color='red', label='cnn')
 
-	#Baseline model
-	scores_bl = dummy_clf.predict(Xtest)
-	fpr, tpr, _ =roc_curve(np.argmax(ytest, axis=1), np.argmax(scores_bl, axis=1))
-	baseline, =plt.plot(fpr,tpr,color='blue', label='baseline')
+    # Baseline model
+    scores_bl = dummy_clf.predict(Xtest)
+    fpr, tpr, _ = roc_curve(np.argmax(ytest, axis=1),
+                            np.argmax(scores_bl, axis=1))
+    baseline, = plt.plot(fpr, tpr, color='blue', label='baseline')
 
-	#Labels
-	plt.xlabel('False positive rate')
-	plt.ylabel('True positive rate')
-	plt.title('ROC Curve')
+    # Labels
+    plt.xlabel('False positive rate')
+    plt.ylabel('True positive rate')
+    plt.title('ROC Curve')
 
-	plt.legend([cnn,baseline],["cnn", "baseline"])
-	plt.show()
+    plt.legend([cnn, baseline], ["cnn", "baseline"])
+    plt.show()
 
 
 # grab the list of images in our dataset directory, then initialize
@@ -103,37 +100,27 @@ print("orig x_train shape:", trainX.shape)
 print("orig y_train shape:", trainY.shape)
 
 model = keras.Sequential()
-model.add(Conv2D(16, (3, 3), padding='same',input_shape=trainX.shape[1:], activation='relu'))
-model.add(Conv2D(16, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(16, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(16, (3, 3), strides=(2, 2),padding='same', activation='relu'))
-model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(32, (3, 3), strides=(2, 2),padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), strides=(2, 2),padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), strides=(2, 2),padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-# model.add(Conv2D(64, (3, 3), strides=(2, 2),padding='same', activation='relu'))
-# model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-# model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-
+model.add(Conv2D(16, (3,3), padding='same', input_shape=trainX.shape[1:],activation='relu'))
+model.add(Conv2D(16, (3,3), strides=(2,2), padding='same', activation='relu'))
+model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(32, (3,3), strides=(2,2), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3,3), strides=(2,2), padding='same', activation='relu'))
 model.add(Dropout(0.5))
 model.add(Flatten())
-model.add(Dense(num_classes, activation='softmax', kernel_regularizer=regularizers.l1(0.001)))  # change the weight parameter of L1(bigger and smaller including 0)
-model.compile(loss="categorical_crossentropy",optimizer='adam', metrics=["accuracy"])
+model.add(Dense(num_classes, activation='softmax', kernel_regularizer=regularizers.l1(
+    0.001)))  # change the weight parameter of L1(bigger and smaller including 0)
+model.compile(loss="categorical_crossentropy",
+              optimizer='adam', metrics=["accuracy"])
 
 opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(loss="binary_crossentropy", optimizer=opt,
-	metrics=["accuracy"])
+              metrics=["accuracy"])
 
 model.summary()
-steps_per_epoch = int(np.ceil(trainX.shape[0]//BS)) 
-History = model.fit(trainX, trainY, batch_size=BS, epochs=EPOCHS, steps_per_epoch=steps_per_epoch, validation_split=0.1)
+steps_per_epoch = int(np.ceil(trainX.shape[0]//BS))
+History = model.fit(trainX, trainY, batch_size=BS, epochs=EPOCHS,
+                    steps_per_epoch=steps_per_epoch, validation_split=0.1)
 
 # make predictions on the testing set
 print("Making predictions on the test set...")
@@ -167,20 +154,18 @@ print("Classification Report: ")
 print(classification_report(testY.argmax(axis=1), predIdxs,
                             target_names=lb.classes_))
 
-
-#Baseline model
+# Baseline model
 dummy_clf = DummyClassifier(strategy="most_frequent")
 dummy_clf.fit(trainX, trainY)
 predictions_dummy = dummy_clf.predict(testX)
-
 
 # printing the confusion matrix
 conf_matrix = confusion_matrix(testY.argmax(axis=1), predIdxs)
 print("Confusion Matrix of CNN: ")
 print(conf_matrix)
 print("Confusion Matrix of Baseline: ")
-print(confusion_matrix(np.argmax(testY, axis=1), np.argmax(predictions_dummy, axis=1)))
-
+print(confusion_matrix(np.argmax(testY, axis=1),
+      np.argmax(predictions_dummy, axis=1)))
 
 # plot roc-curve
 plot_roc_models(testX, testY, model, dummy_clf)
