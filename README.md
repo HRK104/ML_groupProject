@@ -24,7 +24,7 @@ python3 mask_detection.py
 ```
  
 # Note
-Within Results_Images.zip, there are results of accuracy_graph, roc-curve, model_table and classification and report
+Within Results_Images.zip, there are results of accuracy_graph, roc-curve, model_table and classification and report. Also, test_video.mov.zip contains sample video to run mask_detection.py. If you want, you can use this.
  
 
  

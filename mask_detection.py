@@ -29,7 +29,7 @@ from sklearn.dummy import DummyClassifier
 
 face_detector = cv2.dnn.readNet('face_detector/deploy.prototxt', 'face_detector/res10_300x300_ssd_iter_140000.caffemodel')
 mask_detector = load_model('detect_mask.model')
-test_video = cv2.VideoCapture('test_video.mp4')
+test_video = cv2.VideoCapture('test_video.mov')
 
 while True:
     detected_faces = []
