@@ -21,7 +21,7 @@ from sklearn.dummy import DummyClassifier
 
 
 #define constant
-DIRECTORY = "New_Processed_Images"
+DIRECTORY = "small_dataset"
 FOLDERS = ["with_mask", "without_mask"]
 LR = 1e-4
 NUM_EPOCH = 20
