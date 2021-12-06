@@ -25,8 +25,8 @@ INIT_LR = 1e-4
 EPOCHS = 20
 BS = 32
 
-DIRECTORY = "dataset"
-#DIRECTORY = "small_dataset"
+#DIRECTORY = "dataset"
+DIRECTORY = "small_dataset"
 CATEGORIES = ["with_mask", "without_mask"]
 
 
@@ -109,14 +109,14 @@ model.add(Conv2D(64, (3,3), strides=(2,2), padding='same', activation='relu'))
 model.add(Dropout(0.5))
 model.add(Flatten())
 model.add(Dense(num_classes, activation='softmax', kernel_regularizer=regularizers.l1(
-    0.001)))  # change the weight parameter of L1(bigger and smaller including 0)
+    0.00001)))  # change the weight parameter of L1(bigger and smaller including 0)
 model.compile(loss="categorical_crossentropy",
               optimizer='adam', metrics=["accuracy"])
 
 opt = Adam(lr=INIT_LR, decay=INIT_LR / EPOCHS)
 model.compile(loss="binary_crossentropy", optimizer=opt,
               metrics=["accuracy"])
-
+#model.build(input_shape=input_shape)
 model.summary()
 steps_per_epoch = int(np.ceil(trainX.shape[0]//BS))
 History = model.fit(trainX, trainY, batch_size=BS, epochs=EPOCHS,
@@ -148,6 +148,15 @@ plt.ylabel("Loss/Accuracy")
 plt.legend(loc="lower left")
 plt.savefig("plot.png")
 plt.show()
+
+# print the accuracy in percentage
+test_loss, test_acc = model.evaluate(testX, testY, verbose=2)
+print("Validation Accuracy: {}".format(test_acc))
+print("Validation Loss: {}".format(test_loss))
+
+val_loss, val_acc = model.evaluate(trainX, trainY, verbose=2)
+print("Training Accuracy: {}".format(val_acc))
+print("Training Loss: {}".format(val_loss))
 
 # printing classification report
 print("Classification Report: ")
