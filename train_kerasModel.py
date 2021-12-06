@@ -21,12 +21,12 @@ from sklearn.dummy import DummyClassifier
 
 
 #define constant
+DIRECTORY = "New_Processed_Images"
+FOLDERS = ["with_mask", "without_mask"]
 LR = 1e-4
 NUM_EPOCH = 20
 BATCH_SIZE = 32
 
-DIRECTORY = "New_Processed_Images"
-FOLDERS = ["with_mask", "without_mask"]
 
 # this function plot roc graph
 def plot_roc(Xtest, ytest, model, dummy_clf):
